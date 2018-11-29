@@ -40,7 +40,7 @@ const uint8_t GPS_TXPin = A0;
 const uint8_t chipSelect = 10;
 
 // Stockage des localisations
-float locs[1][2] = { 48.9170688, 2.3240448 };
+float locs[1][2] = { 48.8540917, 2.3261858 };
 double  angle = 0;
 int is_r = 0;
 
@@ -172,15 +172,22 @@ void loop() {
   	//Conversion to degrees 
     Serial.println("angle = "); 
     Serial.println(angle, 9);
-    Serial.println("heading = ");
-    Serial.println(heading, 9);
+    //Serial.println("heading = ");
+    //Serial.println(heading, 9);
+    //Serial.print("\nHeading: "); 
+    //Serial.print(heading * 180/M_PI);
+    Serial.print("\nNord : "); 
+    Serial.print(((heading * 180/M_PI) - angle));
+    //Serial.print("\nx1: "); 
+    //Serial.print(fmod(((heading * 180/M_PI) - angle),360));
   	Degrees = fmod(((heading * 180/M_PI) - angle),360); 
     if (Degrees < 0)
     {
-      Degrees = 360 - Degrees;
+      Degrees = 360 + Degrees;
     }
-    Serial.println("degrees = ");
-    Serial.println(Degrees, 9);
+    Serial.println("\ndegrees = ");
+    Serial.println(Degrees);
+    Serial.println("\n\n\n\n\n");
   	LED = Degrees/17; //Led shield has 21 Leds. Dividing 360 by
 
   	//17 will give us values from 0 to 21
@@ -199,7 +206,7 @@ void loop() {
   //Serial.print(angle);
   //Serial.print("\nLED: "); 
   //Serial.println(LED);
-	delay(400);
+	delay(3000);
 }
 
 void logNMEA(uint8_t type) {
@@ -255,12 +262,17 @@ void logNMEA(uint8_t type) {
 	lon = longitude((char*)buffer);
    //lati = latitude(str);
   //lon = longitude(str);
-  Serial.println(lati, 8);
-  Serial.println(lon, 8);
-  Serial.println(locs[0][0], 8);
-  Serial.println(locs[0][1], 8);
-  angle = get_angle(to_radians(lati), to_radians(lon), to_radians(locs[0][0]), to_radians(locs[0][1]));
-  Serial.println(angle);
+  //Serial.println("\nLatitude GPS : ");
+  //Serial.println(lati, 9);
+  //Serial.println("\nLongitude GPS : ");
+  //Serial.println(lon, 9);
+  //Serial.println("\nLatitude localisation : ");
+  //Serial.println(locs[0][0], 9);
+  //Serial.println("\nLongitude localisation : ");
+  //Serial.println(locs[0][1], 9);
+  if (lati != 0 && lon != 0)
+    angle = get_angle(to_radians(lati), to_radians(lon), to_radians(locs[0][0]), to_radians(locs[0][1]));
+  //Serial.println(angle);
 }
 
 
@@ -270,11 +282,15 @@ double  conv_coords(float in_coords)
   //Serial.println(in_coords);
 	//Initialize the location.
 	double f = in_coords;
+  //Serial.println("\natof : ");
+  //Serial.println(in_coords, 9);
 	// Get the first two digits by turning f into an integer, then doing an integer divide by 100;
 	// firsttowdigits should be 77 at this point.
 	int firsttwodigits = ((int)f)/100; //This assumes that f < 10000.
 	double nexttwodigits = f - (double)(firsttwodigits*100);
 	double theFinalAnswer = (double)(firsttwodigits + nexttwodigits/60.0);
+  //Serial.println("\ncoords a la fin de conv coords : ");
+  //Serial.println(theFinalAnswer, 9);
 	return theFinalAnswer;
 }
 
